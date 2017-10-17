@@ -94,34 +94,34 @@ if MODULE.lower() == "opi_pya20":
 # or PA9 - Security Light
 
 PINS = {
-   3 : {'name' : 'PA12', 'pin' : 3, 'port' : port.PA12},
-   5 : {'name' : 'PA11', 'pin' : 5, 'port' : port.PA11},
-   7 : {'name' : 'PA6',  'pin' : 7, 'port' : port.PA6},
-   8 : {'name' : 'PA13', 'pin' : 8, 'port' : port.PA13},
-   10 : {'name' : 'PA14', 'pin' : 10, 'port' : port.PA14},
-   11 : {'name' : 'PA1',  'pin' : 11, 'port' : port.PA1},
-   12 : {'name' : 'PD14', 'pin' : 12, 'port' : port.PD14},
-   13 : {'name' : 'PA0',  'pin' : 13, 'port' : port.PA0},
-   15 : {'name' : 'PA3',  'pin' : 15, 'port' : port.PA3},
-   16 : {'name' : 'PC4',  'pin' : 16, 'port' : port.PC4},
-   18 : {'name' : 'PC7',  'pin' : 18, 'port' : port.PC7},
-   19 : {'name' : 'PC0',  'pin' : 19, 'port' : port.PC0},
-   21 : {'name' : 'PC1',  'pin' : 21, 'port' : port.PC1},
-   22 : {'name' : 'PA2',  'pin' : 22, 'port' : port.PA2},
-   23 : {'name' : 'PC2',  'pin' : 23, 'port' : port.PC2},
-   24 : {'name' : 'PC3',  'pin' : 24, 'port' : port.PC3},
-   26 : {'name' : 'PA21', 'pin' : 26, 'port' : port.PA21},
-   27 : {'name' : 'PA19', 'pin' : 27, 'port' : port.PA19},
-   28 : {'name' : 'PA18', 'pin' : 28, 'port' : port.PA18},
-   29 : {'name' : 'PA7',  'pin' : 29, 'port' : port.PA7},
-   31 : {'name' : 'PA8',  'pin' : 31, 'port' : port.PA8},
-   32 : {'name' : 'PG8',  'pin' : 32, 'port' : port.PG8},
-   33 : {'name' : 'PA9',  'pin' : 33, 'port' : port.PA9},
-   35 : {'name' : 'PA10', 'pin' : 35, 'port' : port.PA10},
-   36 : {'name' : 'PG9',  'pin' : 36, 'port' : port.PG9},
-   37 : {'name' : 'PA20', 'pin' : 37, 'port' : port.PA20},
-   38 : {'name' : 'PG6',  'pin' : 38, 'port' : port.PG6},
-   40 : {'name' : 'PG7',  'pin' : 40, 'port' : port.PG7}
+  3 :  port.PA12,
+  5 :  port.PA11,
+  7 :  port.PA6,
+  8 :  port.PA13,
+  10 : port.PA14,
+  11 : port.PA1,
+  12 : port.PD14,
+  13 : port.PA0,
+  15 : port.PA3,
+  16 : port.PC4,
+  18 : port.PC7,
+  19 : port.PC0,
+  21 : port.PC1,
+  22 : port.PA2,
+  23 : port.PC2,
+  24 : port.PC3,
+  26 : port.PA21,
+  27 : port.PA19,
+  28 : port.PA18,
+  29 : port.PA7,
+  31 : port.PA8,
+  32 : port.PG8,
+  33 : port.PA9,
+  35 : port.PA10,
+  36 : port.PG9,
+  37 : port.PA20,
+  38 : port.PG6,
+  40 : port.PG7
 }
 
 if DEBUG:
@@ -219,18 +219,22 @@ def on_mqtt_message(mosq, obj, msg):
     topicparts = msg.topic.split("/")
     pin = int(topicparts[len(topicparts) - 1])
     value = int(msg.payload)
-    changePort = PINS[pin]['port']
-        
-    logging.debug("Incoming message for pin %d -> %d" % (pin, value))
-    print("Incoming message for pin %d -> %d", pin, value)
-    print("change port is %s", changePort)
-    print("port PD12 is ", port.PD14)
-    if value == 1:
-        gpio.setcfg(changePort, gpio.OUTPUT)
-        gpio.output(changePort, gpio.HIGH)
-    else:
-        gpio.setcfg(changePort, gpio.OUTPUT)
-        gpio.output(changePort, gpio.LOW)
+    
+    try :
+        changedPort = PINS[pin]
+        logging.debug("Incoming message for pin %d -> %d" % (pin, value))
+        print("Incoming message for pin %d -> %d", pin, value)
+        print("change port is %s", changedPort)
+        if value == 1:
+            gpio.setcfg(changedPort, gpio.OUTPUT)
+            gpio.output(changedPort, gpio.HIGH)
+        else:
+            gpio.setcfg(changedPort, gpio.OUTPUT)
+            gpio.output(changePort, gpio.LOW)
+    except Exception as e:
+        logging.error("Error %s" % (str(e)))
+  
+
 
 
 # End of MQTT callbacks
@@ -242,15 +246,6 @@ def cleanup(signum, frame):
     in the event of a SIGTERM or SIGINT.
     """
     # Cleanup our interface modules
-    if PFIO_MODULE:
-        logging.debug("Clean up PiFace.PFIO module")
-        PFIO.deinit()
-
-    if GPIO_MODULE:
-        logging.debug("Clean up RPi.GPIO module")
-        for pin in GPIO_OUTPUT_PINS:
-            GPIO.output(pin, GPIO.HIGH)
-        GPIO.cleanup()
 
     # Publish our LWT and cleanup the MQTT connection
     logging.info("Disconnecting from broker...")
