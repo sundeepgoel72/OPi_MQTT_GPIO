@@ -1,0 +1,26 @@
+[global]
+BOARD              = orangepi  #orangepi or raspberrypi
+MODULE             = <gpio or pfio or pyA20> #gpio or pfio for raspberrypi or pyA20 for orangepi
+DEBUG              = True
+
+MQTT_HOST          = localhost
+MQTT_PORT          = 1883
+MQTT_USERNAME      = 
+MQTT_PASSWORD      =    
+MQTT_TLS_PROTOCOL  =    #tlsv1_2
+MQTT_CERT_PATH     =    #/path/to/ca.pem 
+MQTT_TLS_INSECURE  =    #False
+MQTT_CLIENT_ID     = mqtt-gpio-monitor
+MQTT_QOS           = 2
+MQTT_RETAIN        = False
+MQTT_CLEAN_SESSION = True
+
+MQTT_TOPIC         = /mqtt-gpio-monitor
+MQTT_LWT           = /clients/mqtt-gpio-monitor
+
+MONITOR_PINS       = 1, 2, 3, 4
+MONITOR_PINS_PUD   = UP
+MONITOR_PIN_NUMBERING = BOARD
+MONITOR_OUT_INVERT = False
+MONITOR_POLL       = 0.1
+MONITOR_REFRESH    = /mqtt-gpio-monitor/refresh
