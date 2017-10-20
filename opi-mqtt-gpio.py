@@ -24,8 +24,8 @@ GPIO_OUTPUT_PINS = []
 
 # Script name (without extension) used for config/logfile names
 APPNAME = os.path.splitext(os.path.basename(__file__))[0]
-INIFILE = os.getenv('INIFILE', APPNAME + '.ini')
-LOGFILE = os.getenv('LOGFILE', APPNAME + '.log')
+INIFILE = sys.path[0]    +'/'+APPNAME+'.ini'
+LOGFILE = sys.path[0]    +'/'+APPNAME+'.log'
 
 # Read the config file
 config = configparser.ConfigParser()
@@ -86,12 +86,12 @@ if MODULE.lower() == "opi_pya20":
         sys.exit(2)
 
 
-#pin 12 or PD14 = Plant Light"
-# or PC4 - PIR1
-# or PC7 - PIR2
-# or PA7 - Fresh Air
-# or PA8 - Exhaust Fan
-# or PA9 - Security Light
+# pin 12 or PD14 = Plant Light"
+# pin 16 or PC4 - PIR1
+# pin 18 or PC7 - PIR2
+# pin 29 or PA7 - Fresh Air
+# pin 31 or PA8 - Exhaust Fan
+# pin 33 or PA9 - Security Light
 
 PINS = {
   3 :  port.PA12,
@@ -223,14 +223,14 @@ def on_mqtt_message(mosq, obj, msg):
     try :
         changedPort = PINS[pin]
         logging.debug("Incoming message for pin %d -> %d" % (pin, value))
-        print("Incoming message for pin %d -> %d", pin, value)
-        print("change port is %s", changedPort)
+        print("Incoming message for pin %d -> %d"% (pin, value))
+        print("change port is %s" % (changedPort))
         if value == 1:
             gpio.setcfg(changedPort, gpio.OUTPUT)
             gpio.output(changedPort, gpio.HIGH)
         else:
             gpio.setcfg(changedPort, gpio.OUTPUT)
-            gpio.output(changePort, gpio.LOW)
+            gpio.output(changedPort, gpio.LOW)
     except Exception as e:
         logging.error("Error %s" % (str(e)))
   
