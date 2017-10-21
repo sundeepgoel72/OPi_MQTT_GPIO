@@ -23,9 +23,11 @@ The incoming messages need to arrive on {topic}/in/{pin} with a value of either 
 E.g. a message arriving on {topic}/in/3 with value 1 will set pin 3 to HIGH.
 
 To use from command prompt
+
     sudo python opi-mqtt-gpio.py
     
 to execute on startup, add following to /etc/rc.local
+
     python /<path of file>/opi-mqtt-gpio.py &
     
 Have fun !!!!!
